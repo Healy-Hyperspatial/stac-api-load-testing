@@ -1,4 +1,4 @@
-FROM python:3.8-slim as base
+FROM python:3.10-slim as base
 
 FROM base as builder
 # Any python libraries that require system libraries to be installed will likely
@@ -19,4 +19,4 @@ ENV PATH=$PATH:/install/bin
 RUN mkdir -p /install && \
     pip install --upgrade wheel && \
     pip install uvicorn && \
-    pip install stac-fastapi.pgstac==2.3.0 
+    pip install stac-fastapi.pgstac==2.4.11 
