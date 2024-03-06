@@ -1,0 +1,11 @@
+execution:
+- executor: locust
+  concurrency: 100
+  ramp-up: 10m
+  iterations: 10000
+  scenario: stac-fastapi-es
+
+scenarios:
+  stac-fastapi-es:
+    default-address: http://localhost:8084
+    script: locustfile.py

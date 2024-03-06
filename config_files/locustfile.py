@@ -1,6 +1,7 @@
 from locust import HttpUser, task, constant, tag, run_single_user
 from helpers import test_item
 
+import os
 import random
 import json
 
@@ -8,7 +9,7 @@ import json
 class WebsiteTestUser(HttpUser):
     # If one declares a host attribute in the user class, it will be used in the
     # case when no --host is specified on the command line or in the web request.
-    host = "http://localhost:8083"
+    host = os.getenv("LOCUST_HOST", "http://localhost:8083")
     default_load_multiplier = 1
 
     def on_start(self):
