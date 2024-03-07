@@ -1,80 +1,94 @@
 """stac-api-load-balancing cli tool."""
 import os
+import re
+import subprocess
 
 import click
+import yaml  # type: ignore
 
 from data_loader import data_loader
 
-# Map backend names to their respective port numbers and Taurus YAML configuration files
-backend_to_config_map = {
-    "pgstac": ("8083", "taurus_locust_pgstac.yml"),
-    "es": ("8084", "taurus_locust_es.yml"),
-    "mongo": ("8085", "taurus_locust_mongo.yml"),
-}
+
+def generate_taurus_config(api_url, template_path="config_files/taurus_locust.yml"):
+    """Generate a Taurus configuration file with the specified API URL."""
+    locustfile_path = os.path.join(
+        "config_files", "locustfile.py"
+    )  # Relative path from the project root
+    safe_api_url = re.sub(r"[^a-zA-Z0-9]+", "_", api_url)
+    output_path = f"taurus_config_{safe_api_url}.yml"
+
+    try:
+        with open(template_path, "r") as file:
+            config = yaml.safe_load(file)
+
+        config["scenarios"]["default"]["script"] = locustfile_path
+        config["scenarios"]["default"]["default-address"] = api_url
+
+        with open(output_path, "w") as file:
+            yaml.safe_dump(config, file)
+
+        return output_path
+    except Exception as e:
+        print(f"Error creating Taurus configuration file: {e}")
+        return None
 
 
 @click.option(
-    "-i", "--ingest", is_flag=True, help="Ingest sample data for a chosen backend."
+    "-i", "--ingest", is_flag=True, help="Ingest sample data into the STAC API."
 )
 @click.option(
-    "-l", "--locust", is_flag=True, help="Run Locust outside of the Taurus wrapper."
+    "-l", "--locust", is_flag=True, help="Run Locust load tests against the STAC API."
 )
 @click.option(
     "-t",
     "--taurus",
     is_flag=True,
-    help="Run the Taurus wrapper based on the specified backend.",
-)
-@click.option(
-    "-b",
-    "--backend",
-    type=click.Choice(["pgstac", "es", "mongo"], case_sensitive=False),
-    default="pgstac",
-    help="Specify the backend for Locust or Taurus execution.",
+    help="Run the Taurus wrapper for performance testing against the STAC API.",
 )
 @click.option(
     "-a",
     "--api-address",
-    default=None,
-    help="Specify a custom API address for testing, overriding the backend-derived address.",
+    default="http://localhost:8080",
+    help="Specify the STAC API URL to test against.",
 )
 @click.command()
 @click.version_option(version="0.1.0")
-def main(ingest, locust, taurus, backend, api_address):
+def main(ingest, locust, taurus, api_address):
     """
     Entry point for the stac-api-load-balancing CLI tool.
 
-    Allows the user to optionally specify a custom API address for testing,
-    ingest sample data, run Locust tests directly, or execute Taurus
-    performance tests based on the specified backend or custom API address.
+    This tool facilitates data ingestion, Locust load testing, and Taurus performance testing
+    against a specified STAC API endpoint.
 
     Args:
-        ingest (bool): If True, triggers the ingestion of sample data into the specified backend.
-        locust (bool): If True, runs Locust load testing directly outside of the Taurus wrapper.
-        taurus (bool): If True, executes Taurus performance testing for the specified backend.
-        backend (str): Specifies the backend to be used. Options are 'pgstac', 'es', or 'mongo'.
-                       Determines the host URL and configuration file for testing if no custom API address is provided.
-        api_address (str, optional): Custom API address for testing, overrides backend-derived address.
-                                     Example format: 'http://custom-api:port'.
+        ingest (bool): If true, ingests sample data into the specified STAC API.
+        locust (bool): If true, conducts Locust load testing against the STAC API.
+        taurus (bool): If true, performs Taurus performance testing against the STAC API.
+        api_address (str): The URL of the STAC API for testing.
     """
-    host = (
-        api_address
-        if api_address
-        else f"http://localhost:{backend_to_config_map[backend][0]}"
-    )
-
-    os.environ["LOCUST_HOST"] = host
+    os.environ["LOCUST_HOST"] = api_address
 
     if ingest:
-        data_loader.load_items(stac_api_base_url=host)
+        data_loader.load_items(stac_api_base_url=api_address)
     elif locust:
-        # Run Locust directly with the determined or specified host
-        os.system(f"locust --locustfile config_files/locustfile.py --host {host}")
+        subprocess.run(
+            [
+                "locust",
+                "--locustfile",
+                "config_files/locustfile.py",
+                "--host",
+                api_address,
+            ],
+            check=True,
+        )
     elif taurus:
-        # If using a custom API address with Taurus, consider how you'll handle configuration since
-        # Taurus configurations are pre-defined for each backend. You might need a more dynamic approach or separate handling.
-        config_file_path = f"config_files/{backend_to_config_map[backend][1]}"
-        os.system(f"bzt {config_file_path}")
+        config_file_path = generate_taurus_config(api_address)
+        if config_file_path:
+            try:
+                subprocess.run(["bzt", config_file_path], check=True)
+            finally:
+                if os.path.exists(config_file_path):
+                    os.remove(config_file_path)  # Cleanup the temporary config file
 
 
 if __name__ == "__main__":

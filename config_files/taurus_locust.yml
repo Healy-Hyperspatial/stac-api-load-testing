@@ -1,0 +1,14 @@
+execution:
+  - executor: locust
+    concurrency: 10
+    ramp-up: 1m
+    iterations: 100
+    scenario: default
+
+settings:
+  artifacts-dir: ./taurus-artifacts
+
+scenarios:
+  default:
+    script: locustfile.py
+    default-address: http:/localhost:8082
