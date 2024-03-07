@@ -4,8 +4,9 @@ import os
 import random
 
 from locust import HttpUser, run_single_user, tag, task
+from pkg_resources import resource_filename
 
-from config_files.helpers import test_item
+from helpers import test_item
 
 
 class WebsiteTestUser(HttpUser):
@@ -41,10 +42,14 @@ class WebsiteTestUser(HttpUser):
         Returns:
             dict: A dictionary containing the loaded JSON data.
         """
-        with open(file) as f:
-            data = json.load(f)
-        return data
-
+        try:
+            file_path = resource_filename("stac_api_load_balancing.data_loader", f"setup_data/{file}")
+            with open(file_path, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError as e:
+            print(f"File not found: {e}")
+            return {}
+        
     def get_collection_ids(self):
         """
         Fetch and return all available collection IDs from the API.
@@ -149,7 +154,7 @@ class WebsiteTestUser(HttpUser):
         Selects an item ID at random from a predefined list and requests it.
         """
         random_number = random.randint(1, 11)
-        item = self.load_file("data_loader/setup_data/sentinel-s2-l2a-cogs_0_100.json")
+        item = self.load_file("sentinel-s2-l2a-cogs_0_100.json")
         random_id = item["features"][random_number]["id"]
         self.client.get(
             f"/collections/test-collection/items/{random_id}", name="get-item"

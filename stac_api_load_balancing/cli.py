@@ -2,18 +2,19 @@
 import os
 import re
 import subprocess
-
 import click
 import yaml  # type: ignore
+import pkg_resources
+from .data_loader import data_loader
 
-from data_loader import data_loader
-
-
-def generate_taurus_config(api_url, template_path="config_files/taurus_locust.yml"):
+def generate_taurus_config(api_url):
     """Generate a Taurus configuration file with the specified API URL."""
-    locustfile_path = os.path.join(
-        "config_files", "locustfile.py"
-    )  # Relative path from the project root
+    template_path = pkg_resources.resource_filename(
+        __name__, "config_files/taurus_locust.yml")
+    print("template path: ", template_path)
+    locustfile_path = pkg_resources.resource_filename(
+        __name__, "config_files/locustfile.py")
+
     safe_api_url = re.sub(r"[^a-zA-Z0-9]+", "_", api_url)
     output_path = f"taurus_config_{safe_api_url}.yml"
 
@@ -21,6 +22,7 @@ def generate_taurus_config(api_url, template_path="config_files/taurus_locust.ym
         with open(template_path, "r") as file:
             config = yaml.safe_load(file)
 
+        # Setting the script path directly to where `locustfile.py` is expected to be within the package
         config["scenarios"]["default"]["script"] = locustfile_path
         config["scenarios"]["default"]["default-address"] = api_url
 
@@ -32,25 +34,10 @@ def generate_taurus_config(api_url, template_path="config_files/taurus_locust.ym
         print(f"Error creating Taurus configuration file: {e}")
         return None
 
-
-@click.option(
-    "-i", "--ingest", is_flag=True, help="Ingest sample data into the STAC API."
-)
-@click.option(
-    "-l", "--locust", is_flag=True, help="Run Locust load tests against the STAC API."
-)
-@click.option(
-    "-t",
-    "--taurus",
-    is_flag=True,
-    help="Run the Taurus wrapper for performance testing against the STAC API.",
-)
-@click.option(
-    "-a",
-    "--api-address",
-    default="http://localhost:8080",
-    help="Specify the STAC API URL to test against.",
-)
+@click.option("-i", "--ingest", is_flag=True, help="Ingest sample data into the STAC API.")
+@click.option("-l", "--locust", is_flag=True, help="Run Locust load tests against the STAC API.")
+@click.option("-t", "--taurus", is_flag=True, help="Run the Taurus wrapper for performance testing against the STAC API.")
+@click.option("-a", "--api-address", default="http://localhost:8080", help="Specify the STAC API URL to test against.")
 @click.command()
 @click.version_option(version="0.1.0")
 def main(ingest, locust, taurus, api_address):
@@ -72,13 +59,7 @@ def main(ingest, locust, taurus, api_address):
         data_loader.load_items(stac_api_base_url=api_address)
     elif locust:
         subprocess.run(
-            [
-                "locust",
-                "--locustfile",
-                "config_files/locustfile.py",
-                "--host",
-                api_address,
-            ],
+            ["locust", "--locustfile", pkg_resources.resource_filename(__name__, "config_files/locustfile.py"), "--host", api_address],
             check=True,
         )
     elif taurus:
@@ -89,7 +70,6 @@ def main(ingest, locust, taurus, api_address):
             finally:
                 if os.path.exists(config_file_path):
                     os.remove(config_file_path)  # Cleanup the temporary config file
-
 
 if __name__ == "__main__":
     main()

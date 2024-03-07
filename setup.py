@@ -20,6 +20,9 @@ setup(
         "bzt",
     ],
     packages=["stac_api_load_balancing"],
+    package_data={
+        "stac_api_load_balancing": ["config_files/*", "data_loader/*"]
+    },
     entry_points={
         "console_scripts": ["stac-api-load-balancing=stac_api_load_balancing.cli:main"]
     },
@@ -29,5 +32,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
-    tests_require=["pytest"],
+    extras_require={
+        "test": ["pytest"],
+    }
 )

@@ -14,27 +14,36 @@ Taurus and Locust load balancing tools for testing stac-api backends.
 ```
 Usage: stac-api-load-balancing [OPTIONS]
 
+  Entry point for the stac-api-load-balancing CLI tool.
+
+  This tool facilitates data ingestion, Locust load testing, and Taurus
+  performance testing against a specified STAC API endpoint.
+
+Args:     
+  ingest (bool): If true, ingests sample data into the specified STAC API.     
+  locust (bool): If true, conducts Locust load testing against the STAC API.     
+  taurus (bool): If true, performs Taurus performance testing against the STAC API.     
+  api_address (str): The URL of the STAC API for testing.  
+
 Options:
-  --version                       Show the version and exit.
-  -b, --backend [pgstac|es|mongo]
-                                  Specify the backend for Locust or Taurus
-                                  execution.
-  -t, --taurus                    Run the Taurus wrapper based on the
-                                  specified backend.
-  -l, --locust                    Run Locust outside of the Taurus wrapper.
-  -i, --ingest                    Ingest sample data for a chosen backend.
-  --help                          Show this message and exit.
+  --version               Show the version and exit.
+  -a, --api-address TEXT  Specify the STAC API URL to test against.
+  -t, --taurus            Run the Taurus wrapper for performance testing
+                          against the STAC API.
+  -l, --locust            Run Locust load tests against the STAC API.
+  -i, --ingest            Ingest sample data into the STAC API.
+  --help                  Show this message and exit.
 ```
 
-## Ingest test data (es|pgstac|mongo)
-```$ stac-api-load-balancing --ingest --backend es```
+## Ingest test data
+```$ stac-api-load-balancing --ingest --api-address http://localhost:8084```
 
 ## Run Locust Load Balancing Ouside of Taurus Wrapper
-```$ stac-api-load-balancing --locust```  
+```$ stac-api-load-balancing --locust --api-address http://localhost:8084```  
 - go to ```http://localhost:8089``` and start with desired settings
 
 ## Inside of Taurus Wrapper
-```$ stac-api-load-balancing --taurus```
+```$ stac-api-load-balancing --taurus --api-address http://localhost:8084```
 
 ## Debugging Locust tasks using a single simulated user
-```$ python config_files/locustfile.py```
+```$ python stac_api_load_balancing/config_files/locustfile.py```
