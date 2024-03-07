@@ -3,6 +3,6 @@ WORKDIR /code
 COPY . /code/
 
 RUN pip install . && \
-    stac-taurus --help
+    stac-api-load-balancing --help
 
-ENTRYPOINT ["stac-taurus"]
+ENTRYPOINT ["stac-api-load-balancing"]

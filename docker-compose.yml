@@ -1,15 +1,15 @@
 version: '3.8'
 services:
-  stac-taurus:
-    container_name: stac-taurus
-    image: stac-taurus
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command:
-      bash -c "stac-taurus --help"
-    volumes:
-      - ./log-files:/app
+  # stac-api-load-balancing:
+  #   container_name: stac-api-load-balancing
+  #   image: stac-api-load-balancing
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command:
+  #     bash -c "stac-api-load-balancing --help"
+    # volumes:
+    #   - ./log-files:/app
 
   app-pgstac:
     container_name: stac-fastapi-pgstac
