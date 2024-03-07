@@ -1,5 +1,4 @@
-"""stac-api-load-balancing setup.py
-"""
+"""stac-api-load-balancing setup.py."""
 from setuptools import setup
 
 __version__ = "0.1.0"
@@ -22,7 +21,7 @@ setup(
     ],
     packages=["stac_api_load_balancing"],
     entry_points={
-        'console_scripts': ['stac-api-load-balancing=stac_api_load_balancing.cli:main']
+        "console_scripts": ["stac-api-load-balancing=stac_api_load_balancing.cli:main"]
     },
     author="Jonathan Healy",
     author_email="jonathan.d.healy@gmail.com",
@@ -30,5 +29,5 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     python_requires=">=3.7",
-    tests_require=["pytest"]
+    tests_require=["pytest"],
 )

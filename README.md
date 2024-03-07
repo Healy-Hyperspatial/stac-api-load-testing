@@ -32,7 +32,6 @@ Options:
 ## Run Locust Load Balancing Ouside of Taurus Wrapper
 ```$ stac-api-load-balancing --locust```  
 - go to ```http://localhost:8089``` and start with desired settings
-- for testing locally from docker-compose in this repo, set Host to: ```http://localhost:8083```
 
 ## Inside of Taurus Wrapper
 ```$ stac-api-load-balancing --taurus```

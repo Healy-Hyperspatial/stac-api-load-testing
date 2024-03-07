@@ -1,32 +1,57 @@
-from locust import HttpUser, task, constant, tag, run_single_user
-from helpers import test_item
-
+"""stac-api-load-balancing locustfile.py config."""
+import json
 import os
 import random
-import json
+
+from locust import HttpUser, run_single_user, tag, task
+
+from config_files.helpers import test_item
 
 
 class WebsiteTestUser(HttpUser):
-    # If one declares a host attribute in the user class, it will be used in the
-    # case when no --host is specified on the command line or in the web request.
+    """
+    Simulates a user performing various API requests to test a web application's performance and behavior.
+
+    This user model includes tasks that cover fetching collections, retrieving specific items within those collections,
+    and conducting spatial searches among other API interactions to simulate real user behavior.
+
+    Attributes:
+        host (str): The base URL for the API, defaulted to 'http://localhost:8083' but can be overridden.
+        default_load_multiplier (int): A default multiplier to adjust the load each task generates.
+    """
+
     host = os.getenv("LOCUST_HOST", "http://localhost:8083")
     default_load_multiplier = 1
 
     def on_start(self):
-        """Called when a Locust start before any task is scheduled."""
+        """Initialize resources before any task is executed."""
         pass
 
     def on_stop(self):
-        """Called when the TaskSet is stopping."""
+        """Clean up resources after tasks are completed."""
         pass
 
     def load_file(self, file) -> dict:
-        f = open(file)
-        data = json.load(f)
+        """
+        Load JSON data from a specified file.
+
+        Args:
+            file (str): The path to the file to be loaded.
+
+        Returns:
+            dict: A dictionary containing the loaded JSON data.
+        """
+        with open(file) as f:
+            data = json.load(f)
         return data
 
     def get_collection_ids(self):
-        """Get all Collection IDs."""
+        """
+        Fetch and return all available collection IDs from the API.
+
+        Returns:
+            list: A list of collection IDs.
+        """
         collections_response = self.client.get("/collections", name="get-collections")
         collections_body = collections_response.json()
         collection_ids = [
@@ -35,7 +60,13 @@ class WebsiteTestUser(HttpUser):
         return collection_ids
 
     def parse_request_items(self, collection_id, items_response):
-        """Parse response, if > 0 items then request Items."""
+        """
+        Parse items from a response and makes requests for each item.
+
+        Args:
+            collection_id (str): The ID of the collection the items belong to.
+            items_response: The response object containing the items data.
+        """
         items_body = items_response.json()
         item_ids = [feature["id"] for feature in items_body["features"]]
 
@@ -46,14 +77,30 @@ class WebsiteTestUser(HttpUser):
             )
 
     def get_collection_bbox(self, collection_id):
-        """get the bbox of a collection"""
+        """
+        Retrieve the bounding box (bbox) of a specified collection.
+
+        Args:
+            collection_id (str): The ID of the collection to fetch the bbox for.
+
+        Returns:
+            list: A list representing the bbox of the collection.
+        """
         collection_response = self.client.get(
             f"/collections/{collection_id}", name="get-collection"
         )
         return collection_response.json()["extent"]["spatial"]["bbox"][0]
 
     def get_sortby(self, get_post):
-        """Randomize the sort order among available fields."""
+        """
+        Randomizes the sort order among available fields for item sorting.
+
+        Args:
+            get_post (str): Indicates the method of the request ('GET' or 'POST').
+
+        Returns:
+            list: A list of strings or dictionaries representing the sort order for items.
+        """
         # TODO retrieve all sortable fields common to items in collection
         fields = ["id", "properties.datetime", "properties.eo:cloud_cover"]
         directions = [random.choice(["+", "-"]) for _ in fields]
@@ -72,26 +119,35 @@ class WebsiteTestUser(HttpUser):
     @tag("root_catalog")
     @task(default_load_multiplier)
     def get_root_catalog(self):
+        """Fetch the landing page/root catalog of the API."""
         self.client.get("/", name="get-landing")
 
     @tag("all_collections")
     @task(default_load_multiplier)
     def get_all_collections(self):
+        """Fetch all collections available in the API."""
         self.client.get("/collections", name="get-collections")
 
     @tag("get_collection")
     @task(default_load_multiplier)
     def get_collection(self):
+        """Fetch a specific collection by ID."""
         self.client.get("/collections/test-collection", name="get-collection")
 
     @tag("item_collection")
     @task(default_load_multiplier)
     def get_item_collection(self):
+        """Fetch items within a specific collection."""
         self.client.get("/collections/test-collection/items", name="get-items")
 
     @tag("get_item")
     @task(default_load_multiplier)
     def get_item(self):
+        """
+        Fetch a specific item by ID within a collection.
+
+        Selects an item ID at random from a predefined list and requests it.
+        """
         random_number = random.randint(1, 11)
         item = self.load_file("data_loader/setup_data/sentinel-s2-l2a-cogs_0_100.json")
         random_id = item["features"][random_number]["id"]
@@ -102,6 +158,12 @@ class WebsiteTestUser(HttpUser):
     @tag("get_bbox")
     @task(0)
     def get_bbox_search(self):
+        """
+        Perform a GET request to search items within a specified bounding box.
+
+        This method simulates a search query using a predefined bounding box to fetch items
+        that fall within the specified geographical area.
+        """
         self.client.get(
             "/search?bbox=-16.171875,-79.095963,179.992188,19.824820",
             name="get-search-bbox",
@@ -110,6 +172,12 @@ class WebsiteTestUser(HttpUser):
     @tag("post_bbox")
     @task(default_load_multiplier)
     def post_bbox_search(self):
+        """
+        Perform a POST request to search items within a specified bounding box.
+
+        This method sends a JSON payload with a bounding box to search for items within
+        that geographical area using a POST request.
+        """
         self.client.post(
             "/search",
             json={"bbox": [16.171875, -79.095963, 179.992188, 19.824820]},
@@ -119,6 +187,15 @@ class WebsiteTestUser(HttpUser):
     @tag("point_intersects")
     @task(default_load_multiplier)
     def post_intersects_search(self):
+        """
+        Search for items that intersect with a specified point.
+
+        Args:
+            None
+
+        This method simulates a user performing a spatial search to find items that intersect
+        with a specific point, using a POST request with a JSON payload describing the point.
+        """
         self.client.post(
             "/search",
             json={
@@ -131,7 +208,13 @@ class WebsiteTestUser(HttpUser):
     @tag("basic_nonspatial")
     @task(default_load_multiplier)
     def basic_nonspatial_search(self):
-        """Simulate a user searching for a Collection by ID."""
+        """
+        Perform a basic non-spatial search for a collection by ID.
+
+        This method randomly chooses between a GET or POST request to search for items
+        within a specific collection identified by its ID. The choice between GET or POST
+        and the handling of the response showcases flexibility in API interaction.
+        """
         collection_ids = self.get_collection_ids()
         collection_id = random.choice(collection_ids)
 
@@ -153,7 +236,13 @@ class WebsiteTestUser(HttpUser):
     @tag("intersects_sortby")
     @task(default_load_multiplier)
     def paged_poi_search(self):
-        """Simulate a user seaching within a collection bbox using a point."""
+        """
+        Perform a paged point-of-interest search within a collection's bounding box.
+
+        This method simulates a more complex user interaction by selecting a random point
+        within the bounding box of a randomly chosen collection. It then performs a search
+        to find items that intersect with this point, also applying a randomized sort order.
+        """
         # Get the bbox of a random collection
         collection_ids = self.get_collection_ids()
         collection_id = random.choice(collection_ids)
@@ -180,7 +269,14 @@ class WebsiteTestUser(HttpUser):
     @tag("user_bbox")
     @task(default_load_multiplier)
     def paged_bbox_search(self):
-        """Simulate a user searching within a collection bbox using an AOI."""
+        """
+        Conduct a paged search within a user-defined bounding box.
+
+        This method demonstrates a scenario where a user specifies an Area of Interest (AOI)
+        as a bounding box within the bounding box of a randomly selected collection. It then
+        performs a search (either GET or POST) to find items within this user-defined AOI,
+        applying a randomized sort order.
+        """
         # Get the bbox of a random collection
         collection_ids = self.get_collection_ids()
         collection_id = random.choice(collection_ids)
@@ -214,10 +310,16 @@ class WebsiteTestUser(HttpUser):
 
         self.parse_request_items(collection_id, items_response)
 
-    #### CRUD routes
     @tag("create_item")
     @task(0)
     def create_item(self):
+        """
+        Create a new item in a specified collection.
+
+        This method simulates the creation of a new item in a test collection by posting
+        a JSON payload representing the item. The item ID is generated randomly to ensure
+        uniqueness.
+        """
         random_number = random.randint(1, 100000)
         item = test_item
         item["id"] = f"test-item-{random_number}"
