@@ -21,13 +21,13 @@ services:
     environment:
       - APP_HOST=0.0.0.0
       - APP_PORT=8082
-      - RELOAD=false
+      - RELOAD=true
       - ENVIRONMENT=local
       - POSTGRES_USER=username
       - POSTGRES_PASS=password
       - POSTGRES_DBNAME=postgis
-      - POSTGRES_HOST_READER=database
-      - POSTGRES_HOST_WRITER=database
+      - POSTGRES_HOST_READER=pgstac
+      - POSTGRES_HOST_WRITER=pgstac
       - POSTGRES_PORT=5432
       - WEB_CONCURRENCY=10
       - VSI_CACHE=TRUE
@@ -47,7 +47,7 @@ services:
 
   pgstac:
     container_name: pgstac
-    image: ghcr.io/stac-utils/pgstac:v0.8.4
+    image: ghcr.io/stac-utils/pgstac:v0.7.10
     environment:
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
