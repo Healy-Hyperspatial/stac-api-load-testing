@@ -6,7 +6,6 @@ import click
 import requests
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "setup_data/")
-STAC_API_BASE_URL = "http://localhost:8084"
 
 
 def load_data(filename):
@@ -15,12 +14,12 @@ def load_data(filename):
         return json.load(file)
 
 
-def load_collection(collection_id):
+def load_collection(collection_id: str, stac_api_base_url: str):
     """Load stac collection into the database."""
     collection = load_data("collection.json")
     collection["id"] = collection_id
     try:
-        resp = requests.post(f"{STAC_API_BASE_URL}/collections", json=collection)
+        resp = requests.post(f"{stac_api_base_url}/collections", json=collection)
         if resp.status_code == 200:
             print(f"Status code: {resp.status_code}")
             print(f"Added collection: {collection['id']}")
@@ -31,17 +30,18 @@ def load_collection(collection_id):
         click.secho("failed to connect")
 
 
-def load_items():
+def load_items(stac_api_base_url: str):
     """Load stac items into the database."""
+    print("HI")
     feature_collection = load_data("sentinel-s2-l2a-cogs_0_100.json")
     collection = "test-collection"
-    load_collection(collection)
+    load_collection(collection_id=collection, stac_api_base_url=stac_api_base_url)
 
     for feature in feature_collection["features"]:
         try:
             feature["collection"] = collection
             resp = requests.post(
-                f"{STAC_API_BASE_URL}/collections/{collection}/items", json=feature
+                f"{stac_api_base_url}/collections/{collection}/items", json=feature
             )
             if resp.status_code == 200:
                 print(f"Status code: {resp.status_code}")
@@ -51,6 +51,3 @@ def load_items():
                 print(f"Item: {feature['id']} already exists")
         except requests.ConnectionError:
             click.secho("failed to connect")
-
-
-load_items()
