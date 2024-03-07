@@ -11,10 +11,6 @@ run = docker-compose \
 	-e APP_PORT=${APP_PORT} \
 	app-pgstac
 
-.PHONY: ingest
-ingest:
-	python3 data_loader/data_loader.py
-
 .PHONY: docker-shell
 docker-shell:
 	$(run) /bin/bash
