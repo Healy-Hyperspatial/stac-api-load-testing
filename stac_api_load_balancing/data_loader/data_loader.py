@@ -40,7 +40,6 @@ def load_collection(collection_id: str, stac_api_base_url: str):
 def load_items(stac_api_base_url: str):
     """Load stac items into the database."""
     feature_collection = load_data("sentinel-s2-l2a-cogs_0_100.json")
-    print("HI")
     if feature_collection:
         collection = "test-collection"
         load_collection(collection_id=collection, stac_api_base_url=stac_api_base_url)
