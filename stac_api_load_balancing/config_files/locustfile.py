@@ -4,9 +4,68 @@ import os
 import random
 
 from locust import HttpUser, run_single_user, tag, task
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename  # type: ignore
 
-from helpers import test_item
+test_item = {
+    "stac_version": "1.0.0",
+    "stac_extensions": [],
+    "type": "Feature",
+    "id": "20201211_223832_CS2",
+    "bbox": [
+        172.91173669923782,
+        1.3438851951615003,
+        172.95469614953714,
+        1.3690476620161975,
+    ],
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [172.91173669923782, 1.3438851951615003],
+                [172.95469614953714, 1.3438851951615003],
+                [172.95469614953714, 1.3690476620161975],
+                [172.91173669923782, 1.3690476620161975],
+                [172.91173669923782, 1.3438851951615003],
+            ]
+        ],
+    },
+    "properties": {"datetime": "2020-12-11T22:38:32.125000Z"},
+    "collection": "simple-collection",
+    "links": [
+        {
+            "rel": "collection",
+            "href": "./collection.json",
+            "type": "application/json",
+            "title": "Simple Example Collection",
+        },
+        {
+            "rel": "root",
+            "href": "./collection.json",
+            "type": "application/json",
+            "title": "Simple Example Collection",
+        },
+        {
+            "rel": "parent",
+            "href": "./collection.json",
+            "type": "application/json",
+            "title": "Simple Example Collection",
+        },
+    ],
+    "assets": {
+        "visual": {
+            "href": "https://storage.googleapis.com/open-cogs/stac-examples/20201211_223832_CS2.tif",
+            "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+            "title": "3-Band Visual",
+            "roles": ["visual"],
+        },
+        "thumbnail": {
+            "href": "https://storage.googleapis.com/open-cogs/stac-examples/20201211_223832_CS2.jpg",
+            "title": "Thumbnail",
+            "type": "image/jpeg",
+            "roles": ["thumbnail"],
+        },
+    },
+}
 
 
 class WebsiteTestUser(HttpUser):
@@ -43,13 +102,15 @@ class WebsiteTestUser(HttpUser):
             dict: A dictionary containing the loaded JSON data.
         """
         try:
-            file_path = resource_filename("stac_api_load_balancing.data_loader", f"setup_data/{file}")
-            with open(file_path, 'r') as file:
+            file_path = resource_filename(
+                "stac_api_load_balancing.data_loader", f"setup_data/{file}"
+            )
+            with open(file_path, "r") as file:
                 return json.load(file)
         except FileNotFoundError as e:
             print(f"File not found: {e}")
             return {}
-        
+
     def get_collection_ids(self):
         """
         Fetch and return all available collection IDs from the API.
