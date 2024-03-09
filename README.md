@@ -22,20 +22,29 @@ Usage: stac-api-load-balancing [OPTIONS]
   This tool facilitates data ingestion, Locust load testing, and Taurus
   performance testing against a specified STAC API endpoint.
 
-Args:     
-  ingest (bool): If true, ingests sample data into the specified STAC API.     
-  locust (bool): If true, conducts Locust load testing against the STAC API.     
-  taurus (bool): If true, performs Taurus performance testing against the STAC API.     
-  api_address (str): The URL of the STAC API for testing.  
+  Args:     
+  ingest (bool): If True, ingest sample data into the specified STAC API.     
+  locust (bool): If True, execute Locust load tests against the
+  specified STAC API.     
+  taurus (bool): If True, perform Taurus performance
+  testing with custom settings against the specified STAC API.     
+  concurrency (int): Specifies the number of concurrent users for Taurus testing. Default is 10.      
+  ramp_up (str): Specifies the ramp-up period for Taurus testing, in Taurus notation (e.g., '1m' for 1 minute). Default is '1m'.  
+  iterations (int): Specifies the number of iterations each virtual user will
+  execute in Taurus testing. Default is 100.     
+  api_address (str): The base URL of the STAC API to be tested.
 
 Options:
-  --version               Show the version and exit.
-  -a, --api-address TEXT  Specify the STAC API URL to test against.
-  -t, --taurus            Run the Taurus wrapper for performance testing
-                          against the STAC API.
-  -l, --locust            Run Locust load tests against the STAC API.
-  -i, --ingest            Ingest sample data into the STAC API.
-  --help                  Show this message and exit.
+  -i, --ingest               Ingest sample data into the STAC API.
+  -l, --locust               Run Locust load tests against the STAC API.
+  -t, --taurus               Run the Taurus wrapper for performance testing
+                             against the STAC API.
+  -c, --concurrency INTEGER  Number of concurrent users for Taurus option.
+  -r, --ramp-up TEXT         Ramp-up time for Taurus option.
+  -n, --iterations INTEGER   Number of iterations for Taurus option.
+  -a, --api-address TEXT     Specify the STAC API URL to test against.
+  --version                  Show the version and exit.
+  --help                     Show this message and exit.
 ```
 
 ## Ingest test data - http://localhost:8084 is just an example url
