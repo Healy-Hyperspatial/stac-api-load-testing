@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+
 ## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+
+## [v0.1.1]
 
 ### Added
 
@@ -14,6 +24,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 ### Fixed
+
+- Fixed sample data location in package files [#4](https://github.com/Healy-Hyperspatial/stac-api-load-balancing/pull/4)
 
 
 ## [v0.1.0]

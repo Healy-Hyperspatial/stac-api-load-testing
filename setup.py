@@ -1,7 +1,7 @@
 """stac-api-load-balancing setup.py."""
 from setuptools import setup
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -20,7 +20,7 @@ setup(
         "bzt",
     ],
     packages=["stac_api_load_balancing"],
-    package_data={"stac_api_load_balancing": ["config_files/*", "data_loader/*"]},
+    # package_data={"stac_api_load_balancing": ["config_files/*", "data_loader/*", "data_loader/setup_data/*"]},
     entry_points={
         "console_scripts": ["stac-api-load-balancing=stac_api_load_balancing.cli:main"]
     },
