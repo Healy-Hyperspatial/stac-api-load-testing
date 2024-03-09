@@ -38,7 +38,6 @@ services:
     ports:
       - "8083:8082"
     volumes:
-      - ./stac_fastapi:/app/stac_fastapi
       - ./scripts:/app/scripts
     depends_on:
       - pgstac
