@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added opensearch docker files for local testing [#3](https://github.com/Healy-Hyperspatial/stac-api-load-balancing/pull/3)
+
 ### Changed
 
 ### Fixed

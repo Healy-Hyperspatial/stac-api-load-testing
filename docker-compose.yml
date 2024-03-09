@@ -66,7 +66,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: backends/Dockerfile-es
+      dockerfile: backends/Dockerfile-elasticsearch
     platform: linux/amd64
     environment:
       - APP_HOST=0.0.0.0
@@ -82,7 +82,6 @@ services:
     ports:
       - "8084:8080"
     volumes:
-      - ./stac_fastapi:/app/stac_fastapi
       - ./scripts:/app/scripts
     depends_on:
       - elasticsearch
@@ -91,7 +90,8 @@ services:
 
   elasticsearch:
     container_name: es-container
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION:-8.1.3}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_VERSION:-8.11.0}
+    hostname: elasticsearch
     environment:
       ES_JAVA_OPTS: -Xms512m -Xmx1g
     volumes:
@@ -99,3 +99,44 @@ services:
       - ./elasticsearch/snapshots:/usr/share/elasticsearch/snapshots
     ports:
       - "9200:9200"
+
+  app-opensearch:
+    container_name: stac-fastapi-os
+    image: stac-utils/stac-fastapi-os
+    restart: always
+    build:
+      context: .
+      dockerfile: backends/Dockerfile-opensearch
+    environment:
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8082
+      - RELOAD=true
+      - ENVIRONMENT=local
+      - WEB_CONCURRENCY=10
+      - ES_HOST=opensearch
+      - ES_PORT=9202
+      - ES_USE_SSL=false
+      - ES_VERIFY_CERTS=false
+      - BACKEND=opensearch
+    ports:
+      - "8085:8082"
+    volumes:
+      - ./scripts:/app/scripts
+    depends_on:
+      - opensearch
+    command:
+      bash -c "python -m stac_fastapi.opensearch.app"
+
+  opensearch:
+    container_name: os-container
+    image: opensearchproject/opensearch:${OPENSEARCH_VERSION:-2.11.1}
+    hostname: opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - ./opensearch/config/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - ./opensearch/snapshots:/usr/share/opensearch/snapshots
+    ports:
+      - "9202:9202"
