@@ -4,12 +4,15 @@ Taurus and Locust load balancing tools for testing stac-api backends.
 ![Alt text](readme_files/taurus-pgstac.png?raw=true "stac-fastapi-pgstac")
 
 
-## Run stac-fastapi pgstac (elasticsearch|pgstac)
+## Run stac-fastapi backends locally (elasticsearch|opensearch|pgstac)
 ```$ docker-compose up pgstac```   
 ```$ docker-compose up app-pgstac```
 
-## Install
-```$ pip install .```  
+## Install locally for development
+```$ pip install -e .```  
+    
+## Install from PyPI   
+```$ pip install stac-api-load-balancing```  
 
 ```
 Usage: stac-api-load-balancing [OPTIONS]
@@ -35,7 +38,7 @@ Options:
   --help                  Show this message and exit.
 ```
 
-## Ingest test data
+## Ingest test data - http://localhost:8084 is just an example url
 ```$ stac-api-load-balancing --ingest --api-address http://localhost:8084```
 
 ## Run Locust Load Balancing Ouside of Taurus Wrapper
