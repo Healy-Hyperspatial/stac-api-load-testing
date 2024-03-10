@@ -77,7 +77,6 @@ services:
       - ES_PORT=9200
       - ES_USE_SSL=false
       - ES_VERIFY_CERTS=false
-      - BACKEND=elasticsearch
     ports:
       - "8084:8080"
     volumes:
@@ -116,7 +115,6 @@ services:
       - ES_PORT=9202
       - ES_USE_SSL=false
       - ES_VERIFY_CERTS=false
-      - BACKEND=opensearch
     ports:
       - "8085:8082"
     volumes:
@@ -146,7 +144,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile.dev.mongo
+      dockerfile: backends/Dockerfile.mongo
     environment:
       - APP_HOST=0.0.0.0
       - APP_PORT=8084
@@ -165,7 +163,7 @@ services:
     depends_on:
       - mongo
     command:
-      bash -c "./scripts/wait-for-it-es.sh mongo-container:27017 && python -m stac_fastapi.mongo.app"
+      bash -c "python -m stac_fastapi.mongo.app"
 
   mongo:
     container_name: mongo-container
