@@ -17,7 +17,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: backends/Dockerfile-pgstac
+      dockerfile: backends/Dockerfile.pgstac
     environment:
       - APP_HOST=0.0.0.0
       - APP_PORT=8082
@@ -65,7 +65,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: backends/Dockerfile-elasticsearch
+      dockerfile: backends/Dockerfile.elasticsearch
     platform: linux/amd64
     environment:
       - APP_HOST=0.0.0.0
@@ -105,7 +105,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: backends/Dockerfile-opensearch
+      dockerfile: backends/Dockerfile.opensearch
     environment:
       - APP_HOST=0.0.0.0
       - APP_PORT=8082
@@ -139,3 +139,40 @@ services:
       - ./opensearch/snapshots:/usr/share/opensearch/snapshots
     ports:
       - "9202:9202"
+
+  app-mongo:
+    container_name: stac-fastapi-mongo
+    image: stac-utils/stac-fastapi-mongo
+    restart: always
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.dev.mongo
+    environment:
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8084
+      - RELOAD=true
+      - ENVIRONMENT=local
+      - BACKEND=mongo
+      - MONGO_DB=stac
+      - MONGO_HOST=mongo
+      - MONGO_USER=root
+      - MONGO_PASS=example
+      - MONGO_PORT=27017
+    ports:
+      - "8086:8084"
+    volumes:
+      - ./scripts:/app/scripts
+    depends_on:
+      - mongo
+    command:
+      bash -c "./scripts/wait-for-it-es.sh mongo-container:27017 && python -m stac_fastapi.mongo.app"
+
+  mongo:
+    container_name: mongo-container
+    image: mongo:7.0.5
+    hostname: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    ports:
+      - "27017:27017"
