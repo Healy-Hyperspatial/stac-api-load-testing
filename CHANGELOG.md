@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added mongodb docker files for local testing [#6](https://github.com/Healy-Hyperspatial/stac-api-load-balancing/pull/6)
+
 ### Changed
 
 ### Fixed
