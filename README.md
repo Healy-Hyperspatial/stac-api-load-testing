@@ -4,9 +4,9 @@ Taurus and Locust load balancing tools for testing stac-api backends.
 ![Alt text](readme_files/taurus-pgstac.png?raw=true "stac-fastapi-pgstac")
 
 
-## Run stac-fastapi backends locally (elasticsearch|opensearch|pgstac)
-```$ docker-compose up pgstac```   
-```$ docker-compose up app-pgstac```
+## Run stac-fastapi backends locally (elasticsearch|opensearch|pgstac|mongo)
+```$ docker-compose up elasticsearch```   
+```$ docker-compose up app-elasticsearch```
 
 ## Install locally for development
 ```$ pip install -e .```  
