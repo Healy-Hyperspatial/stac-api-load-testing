@@ -3,6 +3,6 @@ WORKDIR /code
 COPY . /code/
 
 RUN pip install . && \
-    stac-api-load-balancing --help
+    stac-api-load-testing --help
 
-ENTRYPOINT ["stac-api-load-balancing"]
+ENTRYPOINT ["stac-api-load-testing"]

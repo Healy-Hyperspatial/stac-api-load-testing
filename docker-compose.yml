@@ -1,13 +1,13 @@
 version: '3.8'
 services:
-  # stac-api-load-balancing:
-  #   container_name: stac-api-load-balancing
-  #   image: stac-api-load-balancing
+  # stac-api-load-testing:
+  #   container_name: stac-api-load-testing
+  #   image: stac-api-load-testing
   #   build:
   #     context: .
   #     dockerfile: Dockerfile
   #   command:
-  #     bash -c "stac-api-load-balancing --help"
+  #     bash -c "stac-api-load-testing --help"
     # volumes:
     #   - ./log-files:/app
 

@@ -1,4 +1,4 @@
-"""stac-api-load-balancing locustfile.py config."""
+"""stac-api-load-testing locustfile.py config."""
 import json
 import os
 import random
@@ -103,7 +103,7 @@ class WebsiteTestUser(HttpUser):
         """
         try:
             file_path = resource_filename(
-                "stac_api_load_balancing.data_loader", f"setup_data/{file}"
+                "stac_api_load_testing.data_loader", f"setup_data/{file}"
             )
             with open(file_path, "r") as file:
                 return json.load(file)

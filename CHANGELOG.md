@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Added mongodb docker files for local testing [#6](https://github.com/Healy-Hyperspatial/stac-api-load-balancing/pull/6)
+- Added mongodb docker files for local testing [#6](https://github.com/Healy-Hyperspatial/stac-api-load-testing/pull/6)
 
 ### Changed
 
@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Taurus config options in cli. [#5](https://github.com/Healy-Hyperspatial/stac-api-load-balancing/pull/5)
+- Taurus config options in cli. [#5](https://github.com/Healy-Hyperspatial/stac-api-load-testing/pull/5)
 
 ### Changed
 
@@ -33,13 +33,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Added opensearch docker files for local testing [#3](https://github.com/Healy-Hyperspatial/stac-api-load-balancing/pull/3)
+- Added opensearch docker files for local testing [#3](https://github.com/Healy-Hyperspatial/stac-api-load-testing/pull/3)
 
 ### Changed
 
 ### Fixed
 
-- Fixed sample data location in package files [#4](https://github.com/Healy-Hyperspatial/stac-api-load-balancing/pull/4)
+- Fixed sample data location in package files [#4](https://github.com/Healy-Hyperspatial/stac-api-load-testing/pull/4)
 
 
 ## [v0.1.0]

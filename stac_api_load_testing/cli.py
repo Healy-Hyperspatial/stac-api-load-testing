@@ -1,4 +1,4 @@
-"""stac-api-load-balancing cli tool."""
+"""stac-api-load-testing cli tool."""
 import os
 import re
 import subprocess
@@ -98,7 +98,7 @@ def main(
     iterations: int,
 ):
     """
-    Entry point for the stac-api-load-balancing CLI tool.
+    Entry point for the stac-api-load-testing CLI tool.
 
     This tool facilitates data ingestion, Locust load testing, and Taurus performance testing
     against a specified STAC API endpoint.
